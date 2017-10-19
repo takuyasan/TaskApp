@@ -2,17 +2,25 @@ package jp.techacademy.takuya.hatakeyama2.taskapp;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
@@ -117,6 +125,22 @@ public class MainActivity extends AppCompatActivity {
         reloadListView();
     }
 
+//    @Override
+//    protected void onNewIntent(Intent intent) {
+//        Log.d("Test", "mainOnNewIntent");
+//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+//            String newText = intent.getStringExtra(SearchManager.QUERY);
+//            RealmResults<Task> realmResults = mRealm.where(Task.class).equalTo("category", newText).findAll();
+//            mTaskAdapter.setTaskList(mRealm.copyFromRealm(realmResults));
+//            // TaskのListView用のアダプタに渡す
+//            mListView.setAdapter(mTaskAdapter);
+//            // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+//            mTaskAdapter.notifyDataSetChanged();
+//
+//            Log.d("Test", "change");
+//        }
+//    }
+
     private void reloadListView() {
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
         RealmResults<Task> taskRealmResults = mRealm.where(Task.class).findAllSorted("date", Sort.DESCENDING);
@@ -126,6 +150,96 @@ public class MainActivity extends AppCompatActivity {
         mListView.setAdapter(mTaskAdapter);
         // 表示を更新するために、アダプターにデータが変更されたことを知らせる
         mTaskAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchMenuItem=menu.findItem(R.id.search);
+
+////        このコメントのリスナーを設定しようとするとエラーが発生します
+//        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+//            @Override
+//            public boolean onMenuItemActionExpand(MenuItem item) {
+//                Log.d("Test","Expand");
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onMenuItemActionCollapse(MenuItem item) {
+//                Log.d("Test","Collapse");
+//                return true;
+//            }
+//        });
+        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                Log.d("Test","Expand");
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                Log.d("Test","Collapse");
+                return false;
+            }
+        });
+
+        SearchView searchView =
+                (SearchView) searchMenuItem.getActionView();
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                displaySearchResult(query);
+                return true;
+            }
+
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                displaySearchResult(newText);
+                return true;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Log.d("Test","onClose");
+                return true;
+            }
+        });
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(new ComponentName(this,SearchResultsActivity.class)));
+//        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+        return true;
+
+    }
+
+
+    private void displaySearchResult(String query) {
+        RealmResults<Task> realmResults = mRealm.where(Task.class).like("category", "*"+query+"*", Case.INSENSITIVE).findAll();
+        mTaskAdapter.setTaskList(mRealm.copyFromRealm(realmResults));
+        // TaskのListView用のアダプタに渡す
+        mListView.setAdapter(mTaskAdapter);
+        // 表示を更新するために、アダプターにデータが変更されたことを知らせる
+        mTaskAdapter.notifyDataSetChanged();
+
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.refresh){
+            reloadListView();
+        }
+        return true;
     }
 
     @Override
