@@ -17,6 +17,7 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme">
 
+            <!--別アクティビティでSearchを行おうとした実験の残り-->
             <!--<meta-data-->
                 <!--android:name="android.app.default_searchable"-->
                 <!--android:value=".SearchResultsActivity" />-->
@@ -45,6 +46,7 @@
 
         <receiver android:name=".TaskAlarmReceiver" />
 
+        <!--別アクティビティでSearchを行おうとした実験の残り-->
         <!--<activity-->
             <!--android:name=".SearchResultsActivity"-->
             <!--android:label="@string/app_name">-->
