@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-
+//別アクティビティでSearchを行おうとした実験の残り
 public class SearchResultsActivity extends Activity {
 
     @Override
