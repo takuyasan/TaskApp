@@ -17,10 +17,10 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme">
 
-            <!--別アクティビティでSearchを行おうとした実験の残り-->
-            <!--<meta-data-->
-                <!--android:name="android.app.default_searchable"-->
-                <!--android:value=".SearchResultsActivity" />-->
+            <!-- 別アクティビティでSearchを行おうとした実験の残り -->
+            <!-- <meta-data -->
+            <!-- android:name="android.app.default_searchable" -->
+            <!-- android:value=".SearchResultsActivity" /> -->
 
             <meta-data
                 android:name="android.app.searchable"
@@ -28,15 +28,15 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="android.intent.action.SEARCH"/>
+
+                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
-
         </activity>
         <activity
             android:name=".InputActivity"
-            android:label="タスク"
+            android:label="@string/task_input_activity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -46,23 +46,33 @@
 
         <receiver android:name=".TaskAlarmReceiver" />
 
-        <!--別アクティビティでSearchを行おうとした実験の残り-->
-        <!--<activity-->
-            <!--android:name=".SearchResultsActivity"-->
-            <!--android:label="@string/app_name">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value="jp.techacademy.takuya.hatakeyama2.taskapp.MainActivity" />-->
+        <!-- 別アクティビティでSearchを行おうとした実験の残り -->
+        <!-- <activity -->
+        <!-- android:name=".SearchResultsActivity" -->
+        <!-- android:label="@string/app_name"> -->
+        <!-- <meta-data -->
+        <!-- android:name="android.support.PARENT_ACTIVITY" -->
+        <!-- android:value="jp.techacademy.takuya.hatakeyama2.taskapp.MainActivity" /> -->
 
-            <!--<meta-data-->
-                <!--android:name="android.app.searchable"-->
-                <!--android:resource="@xml/searchable" />-->
 
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.SEARCH" />-->
-            <!--</intent-filter>-->
+        <!-- <meta-data -->
+        <!-- android:name="android.app.searchable" -->
+        <!-- android:resource="@xml/searchable" /> -->
 
-        <!--</activity>-->
+
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.SEARCH" /> -->
+        <!-- </intent-filter> -->
+
+
+        <!-- </activity> -->
+        <activity android:name=".TaskInputActivity"
+            android:label="カテゴリー入力画面"
+            android:parentActivityName=".InputActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="jp.techacademy.takuya.hatakeyama2.taskapp.InputActivity" />
+        </activity>
     </application>
 
 </manifest>

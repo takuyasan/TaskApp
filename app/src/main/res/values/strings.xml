@@ -4,4 +4,15 @@
     <string name="search_hint">Search by Category</string>
     <string name="search_title">SearchTitle</string>
     <string name="refresh_title">refresh_title</string>
+    <string name="task_input_activity">タスク入力画面</string>
+    <string name="title_hint">タイトル</string>
+    <string name="title_content">内容</string>
+    <string name="title_category">区分</string>
+    <string name="done_button_text">決定</string>
+    <string name="times_button_text">--:--</string>
+    <string name="date_button_text">----/--/--</string>
+    <string name="registration_button_text">登録</string>
+    <string name="delete_button_text">削除</string>
+    <string name="category_edit_text_in_category_hint">新規カテゴリー</string>
+    <string name="delete_category_tag_text">削除対象カテゴリー</string>
 </resources>

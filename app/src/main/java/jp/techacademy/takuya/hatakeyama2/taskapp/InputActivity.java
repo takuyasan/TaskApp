@@ -84,6 +84,8 @@ public class InputActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.plus_icon:
+                Intent intent=new Intent(this,TaskInputActivity.class);
+                startActivity(intent);
                 break;
             case R.id.refresh:
                 break;
