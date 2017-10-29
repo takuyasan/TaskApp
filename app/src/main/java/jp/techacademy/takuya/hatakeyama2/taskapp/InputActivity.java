@@ -15,7 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -28,7 +31,9 @@ public class InputActivity extends AppCompatActivity {
 
     private int mYear, mMonth, mDay, mHour, mMinute;
     private Button mDateButton, mTimeButton;
-    private EditText mTitleEdit, mContentEdit,mCategoryEdit;
+    private EditText mTitleEdit, mContentEdit;
+    private Spinner mCategorySpinner;
+    private TextView mCurrentCategoryNameTextView;
     private Task mTask;
     private View.OnClickListener mOnDateClickListener = new View.OnClickListener() {
         @Override
@@ -75,24 +80,33 @@ public class InputActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater=getMenuInflater();
-        menuInflater.inflate(R.menu.menu_input,menu);
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_input, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.plus_icon:
-                Intent intent=new Intent(this,TaskInputActivity.class);
+                Intent intent = new Intent(this, TaskInputActivity.class);
                 startActivity(intent);
                 break;
             case R.id.refresh:
+                refresh();
                 break;
+            case android.R.id.home:
+                finish();
             default:
                 break;
         }
         return true;
+    }
+
+    private void refresh() {
+        mCategorySpinner.setAdapter(MyUtilSpinner.createSpinnerAdapter(this));
+        mTitleEdit.setText(null);
+        mContentEdit.setText(null);
     }
 
     @Override
@@ -115,7 +129,8 @@ public class InputActivity extends AppCompatActivity {
         findViewById(R.id.done_button).setOnClickListener(mOnDoneClickListener);
         mTitleEdit = (EditText) findViewById(R.id.title_edit_text);
         mContentEdit = (EditText) findViewById(R.id.content_edit_text);
-        mCategoryEdit=(EditText)findViewById(R.id.category_edit_text);
+        mCategorySpinner = (Spinner) findViewById(R.id.category_spinner);
+        mCurrentCategoryNameTextView=(TextView)findViewById(R.id.current_category_name_text_view);
 
         // EXTRA_TASK から Task の id を取得して、 id から Task のインスタンスを取得する
         Intent intent = getIntent();
@@ -124,6 +139,7 @@ public class InputActivity extends AppCompatActivity {
         mTask = realm.where(Task.class).equalTo("id", taskId).findFirst();
         realm.close();
 
+        mCategorySpinner.setAdapter(MyUtilSpinner.createSpinnerAdapter(this));
         if (mTask == null) {
             // 新規作成の場合
             Calendar calendar = Calendar.getInstance();
@@ -136,7 +152,7 @@ public class InputActivity extends AppCompatActivity {
             // 更新の場合
             mTitleEdit.setText(mTask.getTitle());
             mContentEdit.setText(mTask.getContents());
-            mCategoryEdit.setText(mTask.getCategory());
+            mCurrentCategoryNameTextView.setText(mTask.getCategory());
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(mTask.getDate());
@@ -154,6 +170,12 @@ public class InputActivity extends AppCompatActivity {
     }
 
     private void addTask() {
+
+        if (mCategorySpinner.getSelectedItem() == null) {
+            Toast.makeText(this, "カテゴリーを指定してください。", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Realm realm = Realm.getDefaultInstance();
 
         realm.beginTransaction();
@@ -175,11 +197,11 @@ public class InputActivity extends AppCompatActivity {
 
         String title = mTitleEdit.getText().toString();
         String content = mContentEdit.getText().toString();
-        String category=mCategoryEdit.getText().toString();
+        String categoryName = mCategorySpinner.getSelectedItem().toString();
 
         mTask.setTitle(title);
         mTask.setContents(content);
-        mTask.setCategory(category);
+        mTask.setCategory(categoryName);
         GregorianCalendar calendar = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute);
         Date date = calendar.getTime();
         mTask.setDate(date);

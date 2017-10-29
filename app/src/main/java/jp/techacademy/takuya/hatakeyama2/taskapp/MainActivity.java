@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import io.realm.Case;
 import io.realm.Realm;
@@ -38,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     };
     private ListView mListView;
     private TaskAdapter mTaskAdapter;
+    private Spinner spinner;
+    private TextView filterTextView;
+    private static boolean flag = false; //スピナーフィルターをセットする際にsetOnItemClickListenerが一度呼ばれてしまうため
 
     MenuItem.OnActionExpandListener onActionExpandListener = new MenuItem.OnActionExpandListener() {
         @Override
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         // ListViewの設定
         mTaskAdapter = new TaskAdapter(MainActivity.this);
         mListView = (ListView) findViewById(R.id.listView1);
+        filterTextView = (TextView) findViewById(R.id.main_current_category_name_text_view);
 
         // ListViewをタップしたときの処理
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -227,10 +233,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        MenuItem spinnerMenuItem = menu.findItem(R.id.category_search_spinner);
+        spinner = (Spinner) spinnerMenuItem.getActionView();
+        spinner.setAdapter(MyUtilSpinner.createSpinnerAdapter(this));
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (flag) {
+                    String filterText = parent.getItemAtPosition(position).toString();
+                    filterTextView.setText(filterText);
+                    RealmResults<Task> realmResults = mRealm.where(Task.class).equalTo("category", filterText).findAll();
+                    mTaskAdapter.setTaskList(mRealm.copyFromRealm(realmResults));
+                    mListView.setAdapter(mTaskAdapter);
+                    mTaskAdapter.notifyDataSetChanged();
+                }
+                flag = true;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 //別アクティビティでSearchを行おうとした実験の残り
 //        searchView.setSearchableInfo(
 //                searchManager.getSearchableInfo(new ComponentName(this,SearchResultsActivity.class)));
 //        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+
         return true;
 
     }
@@ -255,6 +285,9 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.refresh:
                 reloadListView();
+                flag = false;
+                spinner.setAdapter(MyUtilSpinner.createSpinnerAdapter(this));
+                filterTextView.setText(null);
                 break;
             default:
                 break;

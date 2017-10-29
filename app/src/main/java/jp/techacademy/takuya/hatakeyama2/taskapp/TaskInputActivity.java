@@ -7,14 +7,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -58,6 +54,7 @@ public class TaskInputActivity extends AppCompatActivity {
 
                     Toast.makeText(TaskInputActivity.this, "新規カテゴリー： " + categoryName + "が追加されました。", Toast.LENGTH_SHORT).show();
                     mEditText.setText(null);
+                    mSpinner.setAdapter(MyUtilSpinner.createSpinnerAdapter(TaskInputActivity.this));
 
                 }
             }
@@ -67,6 +64,27 @@ public class TaskInputActivity extends AppCompatActivity {
     private View.OnClickListener deleteOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Object currentSpinnerItem = mSpinner.getSelectedItem();
+            if (currentSpinnerItem != null) {
+                Realm realm = Realm.getDefaultInstance();
+
+                RealmResults<Task> taskRealmResults = realm.where(Task.class).equalTo("category", currentSpinnerItem.toString()).findAll();
+                //現在使用されているカテゴリーは削除不可
+                if (taskRealmResults.size() != 0) {
+                    realm.close();
+                    Toast.makeText(TaskInputActivity.this, "現在使用されているカテゴリーのため削除できません。先に該当タスクを削除してください。", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                RealmResults<Category> realmResults = realm.where(Category.class).equalTo("name", currentSpinnerItem.toString()).findAll();
+                realm.beginTransaction();
+                realmResults.deleteAllFromRealm();
+                realm.commitTransaction();
+                realm.close();
+
+                Toast.makeText(TaskInputActivity.this, "既存カテゴリー" + mSpinner.getSelectedItem().toString() + "が削除されました", Toast.LENGTH_SHORT).show();
+                mSpinner.setAdapter(MyUtilSpinner.createSpinnerAdapter(TaskInputActivity.this));
+            }
         }
     };
 
@@ -86,27 +104,7 @@ public class TaskInputActivity extends AppCompatActivity {
 
 
         //Spinnerの内容（現在のカテゴリーテーブルの中身）を設定
-        mSpinner.setAdapter(createSpinnerAdapter());
-    }
-
-    private SpinnerAdapter createSpinnerAdapter() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Category> categoriesRealmResults = realm.where(Category.class).findAll();
-        ArrayAdapter<String> adapter;
-        if (categoriesRealmResults != null) {
-            ArrayList<Category> categoryArrayList=new ArrayList<>(realm.copyFromRealm(categoriesRealmResults));
-            ArrayList<String> categoryNameArrayList=new ArrayList<>();
-            for(Category category:categoryArrayList){
-                categoryNameArrayList.add(category.getName());
-            }
-            adapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,categoryNameArrayList);
-        } else {
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{""});
-        }
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        realm.close();
-        return adapter;
+        mSpinner.setAdapter(MyUtilSpinner.createSpinnerAdapter(this));
     }
 
     @Override
@@ -125,8 +123,11 @@ public class TaskInputActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
-                mSpinner.setAdapter(createSpinnerAdapter());
+                mEditText.setText(null);
+                mSpinner.setAdapter(MyUtilSpinner.createSpinnerAdapter(this));
                 break;
+            case android.R.id.home:
+                finish();
             default:
                 break;
         }

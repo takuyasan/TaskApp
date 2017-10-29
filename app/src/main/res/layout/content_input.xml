@@ -24,17 +24,44 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/title_edit_text"
         android:hint="@string/title_content" />
-    <EditText
-        android:id="@+id/category_edit_text"
+    <LinearLayout
+        android:id="@+id/current_category_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/content_edit_text"
-        android:hint="@string/title_category" />
+        android:orientation="horizontal"
+        android:layout_below="@id/content_edit_text">
+        <TextView
+            android:id="@+id/current_category_tag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="現在のカテゴリー :"
+            android:layout_weight="3"/>
+        <TextView
+            android:id="@+id/current_category_name_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="カテゴリー指定なし"
+            android:layout_weight="2"/>
+
+    </LinearLayout>
+    <TextView
+        android:id="@+id/input_category_name_tag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/current_category_linear_layout"
+        android:text="新規カテゴリー"/>
+    <Spinner
+        android:id="@+id/category_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/input_category_name_tag"
+        android:spinnerMode="dropdown"
+        />
     <Button
         android:id="@+id/date_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/category_edit_text"
+        android:layout_below="@id/category_spinner"
         android:layout_alignParentStart="true"
         android:layout_toLeftOf="@+id/times_button"
         android:text="@string/date_button_text"
@@ -43,7 +70,7 @@
         android:id="@id/times_button"
         android:layout_width="96dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/category_edit_text"
+        android:layout_below="@id/category_spinner"
         android:layout_alignParentRight="true"
         android:text="@string/times_button_text"
         style="@style/Widget.AppCompat.Button.Borderless" />
